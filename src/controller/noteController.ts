@@ -6,7 +6,7 @@ export const retrieveNotes = (
   res: Response,
   next: NextFunction
 ) => {
-  res.json({ notes: NoteService.findAll() });
+  return res.json({ notes: NoteService.findAll() });
 };
 
 export const retrieveNote = (
@@ -15,5 +15,11 @@ export const retrieveNote = (
   next: NextFunction
 ) => {
   const { id } = req.params;
-  res.json({ ...NoteService.findById(+id) });
+  return res.json({ ...NoteService.findById(+id) });
+};
+
+export const createNote = (req: Request, res: Response, next: NextFunction) => {
+  const { text } = req.body;
+  NoteService.create(text);
+  return res.status(201).send();
 };
