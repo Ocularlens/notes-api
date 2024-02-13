@@ -1,4 +1,5 @@
 import bodyParser from "body-parser";
+import 'dotenv/config';
 import express from "express";
 import { access, constants, existsSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
