@@ -11,7 +11,7 @@ export const bodyValidator = (schema: Schema) => {
 
       return res
         .status(400)
-        .json({ message: "VALIDATION_ERROR", errors: message });
+        .json({ message: "Could not handle request", errors: message });
     }
 
     return next();

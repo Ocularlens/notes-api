@@ -3,7 +3,7 @@ import path from "path";
 import { Note } from "../models";
 import { ApiError } from "../util";
 
-const FILE_PATH = path.join(__dirname, "..", "data", "notes.json");
+const FILE_PATH = path.join(__dirname, "..", "..", "data", "notes.json");
 
 export class NoteService {
   static findAll(): Note[] {
@@ -23,10 +23,13 @@ export class NoteService {
       throw new ApiError("Internal Server Error", 500);
     }
   }
-  static create(text: string): void {
+  static create(text: string): Note {
     const notes = NoteService.findAll();
+
+    const id = notes.length === 0 ? 1 : notes[notes.length - 1].id + 1;
+
     const newNote: Note = {
-      id: notes[notes.length - 1].id + 1,
+      id,
       text,
       createdDate: new Date(),
       updatedDate: new Date(),
@@ -34,9 +37,9 @@ export class NoteService {
 
     notes.push(newNote);
 
-    NoteService.saveToFile(JSON.stringify(notes));
+    NoteService.saveToFile(notes);
 
-    return;
+    return newNote;
   }
   static findById(id: number): Note {
     const notes = NoteService.findAll();
@@ -46,9 +49,38 @@ export class NoteService {
 
     return notes[index];
   }
-  // static updateById(id: number): Note {}
-  // static deleteById(id: number): Note {}
-  static saveToFile(str: string): void {
+  static updateById(id: number, text: string): void {
+    NoteService.findById(id);
+
+    const notes = NoteService.findAll();
+    const newNotes: Note[] = notes.map((note) => {
+      if (note.id === id) {
+        return {
+          ...note,
+          text,
+          updatedDate: new Date(),
+        };
+      }
+
+      return note;
+    });
+
+    NoteService.saveToFile(newNotes);
+    return;
+  }
+  static deleteById(id: number): void {
+    NoteService.findById(id);
+
+    const notes = NoteService.findAll();
+    const index = notes.findIndex((note) => note.id === id);
+
+    notes.splice(index, 1);
+
+    NoteService.saveToFile(notes);
+    return;
+  }
+  static saveToFile(notes: Note[]): void {
+    const str = JSON.stringify(notes, null, 2);
     writeFileSync(FILE_PATH, str);
   }
 }
