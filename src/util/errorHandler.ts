@@ -7,8 +7,15 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  const isProd = process.env.NODE_ENV === "production";
+
   console.error(error);
+
   res
     .status(error.statusCode)
-    .json({ statusCode: error.statusCode, message: error.message });
+    .json({
+      statusCode: error.statusCode,
+      message: error.message,
+      ...(!isProd ? { stack: error.stack } : {}),
+    });
 };
